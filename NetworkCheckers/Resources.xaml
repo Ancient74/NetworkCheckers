@@ -1,0 +1,69 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:NetworkCheckers">
+    <Color x:Key="EvenColor">#FFA573</Color>
+    <Color x:Key="OddColor">#A64A00</Color>
+    <SolidColorBrush x:Key="Even" Color="{StaticResource EvenColor}"></SolidColorBrush>
+    <SolidColorBrush x:Key="Odd" Color="{StaticResource OddColor}"></SolidColorBrush>
+    <Duration x:Key="duration">
+        0:0:0:0.3
+    </Duration>
+    <Color x:Key="PressedColor">
+        #FFC873
+    </Color>
+    <Style TargetType="Button">
+        <Setter Property="Margin" Value="0, 10, 0, 0"></Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border CornerRadius="20" BorderThickness="3" Width="200" x:Name="border">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0, 1">
+                                <GradientStop Offset="0" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}"/>
+                                <GradientStop Offset="0.7" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}"/>
+                                <GradientStop x:Name="gradientStop" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush x:Name="borderBrush" Color="Black"></SolidColorBrush>
+                        </Border.BorderBrush>
+                        <ContentPresenter Height="35"  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <ContentPresenter.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock VerticalAlignment="Center" FontSize="20" Text="{TemplateBinding Content}"></TextBlock>
+                                </DataTemplate>
+                            </ContentPresenter.ContentTemplate>
+                        </ContentPresenter>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0" Storyboard.TargetProperty="Color" Storyboard.TargetName="gradientStop" To="{Binding ElementName=gradientStart}"></ColorAnimation>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard >
+                                        <ColorAnimation Duration="{StaticResource duration}" Storyboard.TargetName="borderBrush" Storyboard.TargetProperty="Color" To="Green"></ColorAnimation>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ColorAnimation Duration="{StaticResource duration}" Storyboard.TargetName="borderBrush" Storyboard.TargetProperty="Color" To="Green"></ColorAnimation>
+                                        <ColorAnimation Duration="0" Storyboard.TargetProperty="Color" Storyboard.TargetName="gradientStop" To="{StaticResource PressedColor}"></ColorAnimation>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition To="Normal">
+                                        <Storyboard>
+                                            <ColorAnimation Duration="{StaticResource duration}" Storyboard.TargetName="borderBrush" Storyboard.TargetProperty="Color" To="Black"></ColorAnimation>
+                                        </Storyboard>
+                                    </VisualTransition>
+                                </VisualStateGroup.Transitions>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

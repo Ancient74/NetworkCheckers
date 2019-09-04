@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="NetworkCheckers.Checker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkCheckers"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="40">
+    <Grid>
+        <Ellipse>
+            <Ellipse.InputBindings>
+                <MouseBinding MouseAction="LeftClick" Command="{Binding SelectCommand}"></MouseBinding>
+            </Ellipse.InputBindings>
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Offset="0" Color="{Binding Color1}"/>
+                    <GradientStop Offset="0.5" Color="{Binding Color1}"/>
+                    <GradientStop Offset="0.5" Color="{Binding Color2}"/>
+                    <GradientStop Offset="0.95" Color="{Binding Color2}"/>
+                    <GradientStop Offset="0.95" Color="{Binding SelectedColor}"/>
+                    <GradientStop Offset="1" Color="{Binding SelectedColor}"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+        <Image Visibility="{Binding CrownVisibility}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="10" Height="10" Stretch="Fill">
+            <Image.LayoutTransform>
+                <RotateTransform Angle="{Binding CrownRotation}"/>
+            </Image.LayoutTransform>
+            <Image.InputBindings>
+                <MouseBinding MouseAction="LeftClick" Command="{Binding SelectCommand}"></MouseBinding>
+            </Image.InputBindings>
+            <Image.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <GeometryDrawing>
+                            <GeometryDrawing.Pen>
+                                <Pen Brush="Black" Thickness="1"/>
+                            </GeometryDrawing.Pen>
+                            <GeometryDrawing.Brush>
+                                <SolidColorBrush Color="Yellow"/>
+                            </GeometryDrawing.Brush>
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry>
+                                    <PathFigure IsClosed="True" IsFilled="True" StartPoint="0, 30" >
+                                        <LineSegment Point="0, 10"/>
+                                        <LineSegment Point="2.5, 15"/>
+                                        <LineSegment Point="5, 10"/>
+                                        <LineSegment Point="7.5, 15"/>
+                                        <LineSegment Point="10, 10"/>
+                                        <LineSegment Point="12.5, 15"/>
+                                        <LineSegment Point="15, 10"/>
+                                        <LineSegment Point="15, 30"/>
+                                    </PathFigure>
+                                </PathGeometry>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </Image.Source>
+        </Image>
+    </Grid>
+</UserControl>
