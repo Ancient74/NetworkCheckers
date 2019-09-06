@@ -33,6 +33,10 @@ namespace NetworkCheckers
 
         private void OnTurnDone()
         {
+            lock (locker)
+            {
+                GameViewViewModel.Mover = GameViewViewModel.Mover == PlayerType.White ? PlayerType.Black : PlayerType.White;
+            }
             client.WriteMessage(MessageType.TurnEnd, "");
         }
 
@@ -139,7 +143,7 @@ namespace NetworkCheckers
             if (client != null)
             {
                 UnsubscribeToClient(client);
-                client?.Close();
+                client.Disconnect();
                 client = null;
             }
             SwitchView = 0;
@@ -190,11 +194,7 @@ namespace NetworkCheckers
 
         private void OnTurnStarted(PlayerType playerType)
         {
-            lock(locker)
-            {
-                GameViewViewModel.Mover = playerType;
-                moves = new List<BoardIndex>();
-            }
+            moves = new List<BoardIndex>();
         }
 
         private void OnPlayerTypeRecieved(PlayerType obj)

@@ -23,14 +23,8 @@ namespace NetworkCheckersLib.Network
         public event Action<string> OpponentName;
         public event Action<string> TextMessageRecieved;
 
-        private void OnMessageRecieved(object sender, string e)
+        private void OnMessageRecieved(MessageType messageType, string message)
         {
-            string[] typeAndMessage = e.Split(':');
-            string type = typeAndMessage[0];
-            string message = "";
-            MessageType messageType = (MessageType)Enum.Parse(typeof(MessageType), type);
-            if (typeAndMessage.Length > 1)
-                message = typeAndMessage[1];
             switch (messageType)
             {
                 case MessageType.StartGame:

@@ -8,7 +8,7 @@ namespace NetworkCheckersLib.Network
 {
     public enum MessageType
     {
-        StartGame,
+        StartGame = 0,
         PlayerType,
         StartTurn,
         Step,

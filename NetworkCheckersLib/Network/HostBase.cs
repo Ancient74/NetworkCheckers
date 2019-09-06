@@ -7,13 +7,20 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Threading;
+using System.Collections.Concurrent;
 using log4net;
 
 namespace NetworkCheckersLib.Network
 {
+    public struct HostClient
+    {
+        public TcpClient client;
+        public Timer pingTimer;
+        public int Id;
+    }
     public abstract class HostBase
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HostBase));
+        protected static readonly ILog Log = LogManager.GetLogger(typeof(HostBase));
 
         private TcpListener tcpListener;
         private int Port { get; } = 14447;
@@ -22,149 +29,153 @@ namespace NetworkCheckersLib.Network
 
         private IPAddress IPAddress { get; } = IPAddress.Parse("127.0.0.1");
 
-        protected TcpClient[] clients = new TcpClient[2];
+        protected List<HostClient> clients = new List<HostClient>();
 
-        public event Action NoResonse;
-        public event Action Disconnected;
-        public event Action<TcpClient, string> MessageRecieved;
-
-        private Timer[] pingTimers;
+        public event Action<TcpClient, MessageType, string> MessageRecieved;
 
         public HostBase()
         {
-            Disconnected += OnDisconnected;
-            NoResonse += OnNoResonse;
-        }
-
-        private void OnNoResonse()
-        {
-            if (pingTimers == null)
-                return;
-            foreach(var timer in pingTimers)
-            {
-                timer.Change(Timeout.Infinite, Timeout.Infinite);
-                timer.Dispose();
-            }
-            pingTimers = null;
-            source.Cancel();
         }
 
         public void Start()
         {
+            Log.Info("Server started...");
+            Log.Info($"Listening {IPAddress.ToString()} on port {Port}...");
             tcpListener = new TcpListener(IPAddress, Port);
             Listen();
         }
 
-        public void Stop()
+        private void Listen()
         {
-            Log.Info("Listener stopped...");
-            tcpListener.Stop();
-        }
-
-        private void StartPinging()
-        {
-            pingTimers = new Timer[2];
-            for (int i = 0; i < pingTimers.Length; i++)
+            while(true)
             {
-                int ii = i;
-                pingTimers[i] = new Timer((object state) =>
+                if(clients.Count != 2)
                 {
-                    try
-                    {
-                        lock (clients[ii])
-                        {
-                            var writer = new StreamWriter(clients[ii].GetStream());
-                            writer.WriteLine(MessageType.Ping.ToString());
-                            writer.Flush();
-                        }
-                    }
-                    catch(ObjectDisposedException)
-                    {
-                        return;
-                    }
-                    catch (IOException)
-                    {
-                        Log.Info($"Client{ii+1}: did not respond");
-                        NoResonse?.Invoke();
-                    }
-                }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1.0));
+                    Reset();
+                    WaitForClients();
+                }
             }
         }
 
-        private void Listen()
+        private void WaitForClients()
         {
-            
-            tcpListener.Start();
+            source?.Cancel();
             source = new CancellationTokenSource();
-            Log.Info("Server started...");
-            Log.Info($"Listening {IPAddress.ToString()} on port {Port}...");
-            var client1 = tcpListener.AcceptTcpClient();
-            Log.Info("Client 1 connected");
-            var client2 = tcpListener.AcceptTcpClient();
-            Log.Info("Client 2 connected");
-            clients = new[] { client1, client2 };
-            void listen(TcpClient client, CancellationToken token)
+            tcpListener.Start();
+            Log.Info("Waiting for new clients");
+            while (clients.Count != 2)
             {
-                var clientNo = client == client1 ? 1 : 2;
-                using (client)
+                var client = tcpListener.AcceptTcpClient();
+                var clientHost = new HostClient() { client = client, Id = clients.Count };
+                lock (clients)
+                    clients.Add(clientHost);
+                HandleClient(clientHost, source.Token);
+
+                Log.Info($"Client {clientHost.Id} connected");
+            }
+            Log.Info("Clients are found");
+            tcpListener.Stop();
+        }
+        private async void HandleClient(HostClient clientHost, CancellationToken token)
+        {
+            TcpClient client = clientHost.client;
+            clientHost.pingTimer = new Timer(Ping, client, TimeSpan.FromSeconds(0.0), TimeSpan.FromSeconds(1.0));
+            try
+            {
+                await Task.Run(() =>
                 {
-                    using (var stream = client.GetStream())
+                    using (client)
                     {
-                        using (var reader = new StreamReader(stream))
+                        using (var stream = client.GetStream())
                         {
-                            while (client.Connected)
+                            using (var reader = new BinaryReader(stream))
                             {
-                                try
+                                while (client.Connected)
                                 {
                                     token.ThrowIfCancellationRequested();
                                     if (stream.DataAvailable)
                                     {
-                                        lock (client)
-                                        {
-                                            string line = reader.ReadLine();
-                                            if (line != MessageType.Ping.ToString())
-                                                Log.Info($"Recieved from:Client{clientNo}: {line}");
-                                            MessageRecieved?.Invoke(client, line);
-                                        }
+                                        MessageType messageType = (MessageType)reader.ReadInt32();
+                                        string message = reader.ReadString();
+                                        if(messageType != MessageType.Ping)
+                                            Log.Info(messageType.ToString() + ":" + message);
+                                        MessageRecieved?.Invoke(client, messageType, message);
                                     }
-                                }
-                                catch
-                                {
-                                    return;
                                 }
                             }
                         }
                     }
-                }
+                });
             }
-            var task1 = Task.Run(() => listen(clients[0], source.Token));
-            var task2 = Task.Run(() => listen(clients[1], source.Token));
-            try
+            catch
             {
-                Stop();
-                StartPinging();
-                Task.WaitAll(new[] { task1, task2 }, source.Token);
-            }
-            catch (AggregateException ae)
-            {
-                foreach (var ie in ae.InnerExceptions)
-                    Log.Info(ie);
-                Disconnected?.Invoke();
-            }
-            catch (Exception e)
-            {
-                Log.Info(e.Message);
-                Disconnected?.Invoke();
 
             }
+            finally
+            {
+                DisconnectClient(clientHost);
+            }
         }
-        private void OnDisconnected()
+
+        private void DisconnectClient(HostClient client)
         {
-            clients?[0]?.Close();
-            clients?[1]?.Close();
-            clients = new TcpClient[2];
-            OnNoResonse();
-            Listen();
+            if (clients.Count == 0)
+                return;
+
+            lock(clients)
+                clients.RemoveAll(x=>x.Id == client.Id);
+            client.client?.Dispose();
+            client.pingTimer?.Dispose();
+            Log.Info($"Client {client.Id} has disconnected");
+        }
+
+        private void Ping(object client)
+        {
+            if (!(client is TcpClient tcpClient))
+                return;
+            if (!tcpClient.Connected)
+                return;
+            try
+            {
+                WriteMessage(tcpClient, MessageType.Ping);
+            }
+            catch
+            {
+                source.Cancel();
+                source = new CancellationTokenSource();
+            }
+        }
+        protected void Reset()
+        {
+            for(int i = 0;i<clients.Count; i++)
+            {
+                DisconnectClient(clients[i]);
+                i--;
+            }
+            clients = new List<HostClient>();
+        }
+
+        protected void WriteMessage(TcpClient client, MessageType messageType, string message = "")
+        {
+            if (client == null)
+                return;
+
+            lock(client)
+            {
+                var stream = client.GetStream();
+                var writer = new BinaryWriter(stream);
+                writer.Write((int)messageType);
+                writer.Write(message);
+                writer.Flush();
+            }
+        }
+
+        protected void WriteMessage(MessageType messageType, string message = "")
+        {
+            foreach(var client in clients)
+            {
+                WriteMessage(client.client, messageType, message);
+            }
         }
     }
 }

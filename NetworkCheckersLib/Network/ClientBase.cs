@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace NetworkCheckersLib.Network
 {
-    public class ClientBase : IClient
+    public class ClientBase
     {
         protected TcpClient client;
 
-        public event EventHandler<string> MessageRecieved;
+        public event Action<MessageType, string> MessageRecieved;
         public event Action Connected;
         public event Action Disconnected;
 
@@ -40,13 +40,16 @@ namespace NetworkCheckersLib.Network
             }
             catch
             {
-                Disconnected?.Invoke();
+                Disconnect();
             }
         }
 
         public async void Listen()
         {
+            source?.Cancel();
             source = new CancellationTokenSource();
+            var token = source.Token;
+            pingTimer = new Timer(Ping, null, TimeSpan.Zero, TimeSpan.FromSeconds(1.0));
             try
             {
                 await Task.Run(() =>
@@ -55,79 +58,64 @@ namespace NetworkCheckersLib.Network
                     {
                         using (var stream = client.GetStream())
                         {
-                            using (var reader = new StreamReader(stream))
+                            using (var reader = new BinaryReader(stream))
                             {
-                                using (var writer = new StreamWriter(stream))
+                                while (true)
                                 {
-                                    if (pingTimer != null)
-                                        pingTimer.Dispose();
-                                    pingTimer = new Timer((object state) =>
+                                    token.ThrowIfCancellationRequested();
+                                    if (stream.DataAvailable)
                                     {
-                                        try
-                                        {
-                                            source.Token.ThrowIfCancellationRequested();
-                                            lock (locker)
-                                            {
-                                                writer.WriteLine(MessageType.Ping.ToString());
-                                                writer.Flush();
-                                            }
-                                        }
-                                        catch
-                                        {
-                                            pingTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                                            Disconnect();
-                                        }
-                                    }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1.0));
-                                    while (true)
-                                    {
-                                        try
-                                        {
-                                            source.Token.ThrowIfCancellationRequested();
-                                            if (stream.DataAvailable)
-                                            {
-                                                lock (locker)
-                                                {
-                                                    MessageRecieved?.Invoke(this, reader.ReadLine());
-                                                }
-                                            }
-                                        }
-                                        catch
-                                        {
-                                            Disconnect();
-                                            return;
-                                        }
+                                        MessageRecieved?.Invoke((MessageType)reader.ReadInt32(), reader.ReadString());
                                     }
                                 }
                             }
                         }
                     }
-                }, source.Token);
+                });
             }
-            catch (TaskCanceledException)
+            catch
             {
 
+            }
+            finally
+            {
+                Disconnect();
             }
         }
 
         public bool IsConnected => client != null && client.Client != null && client.Client.Connected;
 
-        public void WriteMessage(MessageType messageType, string message)
+        private void Ping(object state)
         {
-            var stream = client.GetStream();
-            var writer = new StreamWriter(stream);
-            writer.WriteLine(messageType.ToString() + ":" + message);
-            writer.Flush();
+            try
+            {
+                WriteMessage(MessageType.Ping);
+            }
+            catch
+            {
+                source.Cancel();
+            }
+        }
+
+        public void WriteMessage(MessageType messageType, string message = "")
+        {
+            lock(locker)
+            {
+                var stream = client.GetStream();
+                var writer = new BinaryWriter(stream);
+                writer.Write((int)messageType);
+                writer.Write(message);
+                writer.Flush();
+            }
         }
 
         public void Disconnect()
         {
-            Close();
+            pingTimer?.Dispose();
+            pingTimer = null;
+            client?.Dispose();
+            client = null;
             Disconnected?.Invoke();
-        }
-
-        public void Close()
-        {
-            source.Cancel();
         }
     }
 }
