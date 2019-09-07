@@ -22,6 +22,8 @@ namespace NetworkCheckers
         public ChangeNamePopUp()
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            Owner = Application.Current.MainWindow;
         }
     }
 }

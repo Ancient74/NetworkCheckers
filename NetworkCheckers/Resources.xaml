@@ -11,6 +11,32 @@
     <Color x:Key="PressedColor">
         #FFC873
     </Color>
+    <DrawingImage x:Key="Crown">
+        <DrawingImage.Drawing>
+            <GeometryDrawing>
+                <GeometryDrawing.Pen>
+                    <Pen Brush="Black" Thickness="1"/>
+                </GeometryDrawing.Pen>
+                <GeometryDrawing.Brush>
+                    <SolidColorBrush Color="Yellow"/>
+                </GeometryDrawing.Brush>
+                <GeometryDrawing.Geometry>
+                    <PathGeometry>
+                        <PathFigure IsClosed="True" IsFilled="True" StartPoint="0, 30" >
+                            <LineSegment Point="0, 10"/>
+                            <LineSegment Point="2.5, 15"/>
+                            <LineSegment Point="5, 10"/>
+                            <LineSegment Point="7.5, 15"/>
+                            <LineSegment Point="10, 10"/>
+                            <LineSegment Point="12.5, 15"/>
+                            <LineSegment Point="15, 10"/>
+                            <LineSegment Point="15, 30"/>
+                        </PathFigure>
+                    </PathGeometry>
+                </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+        </DrawingImage.Drawing>
+    </DrawingImage>
     <Style TargetType="Button">
         <Setter Property="Margin" Value="0, 10, 0, 0"></Setter>
         <Setter Property="Template">

@@ -5,10 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NetworkCheckers"
         mc:Ignorable="d"
-        Height="200" Width="400" Name="wnd">
+        Height="200" Width="400" ResizeMode="NoResize" Name="wnd">
     <Window.Resources>
         <ResourceDictionary Source="Resources.xaml"/>
     </Window.Resources>
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Icon" Value="{StaticResource Crown}"/>
+        </Style>
+    </Window.Style>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

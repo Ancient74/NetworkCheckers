@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:NetworkCheckers"
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="40">
+    <UserControl.Resources>
+        <ResourceDictionary Source="Resources.xaml"/>
+    </UserControl.Resources>
     <Grid>
         <Ellipse>
             <Ellipse.InputBindings>
@@ -22,41 +25,18 @@
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <Image Visibility="{Binding CrownVisibility}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="10" Height="10" Stretch="Fill">
+        <Image Visibility="{Binding CrownVisibility}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="20" Height="20" Stretch="Fill">
             <Image.LayoutTransform>
                 <RotateTransform Angle="{Binding CrownRotation}"/>
             </Image.LayoutTransform>
             <Image.InputBindings>
                 <MouseBinding MouseAction="LeftClick" Command="{Binding SelectCommand}"></MouseBinding>
             </Image.InputBindings>
-            <Image.Source>
-                <DrawingImage>
-                    <DrawingImage.Drawing>
-                        <GeometryDrawing>
-                            <GeometryDrawing.Pen>
-                                <Pen Brush="Black" Thickness="1"/>
-                            </GeometryDrawing.Pen>
-                            <GeometryDrawing.Brush>
-                                <SolidColorBrush Color="Yellow"/>
-                            </GeometryDrawing.Brush>
-                            <GeometryDrawing.Geometry>
-                                <PathGeometry>
-                                    <PathFigure IsClosed="True" IsFilled="True" StartPoint="0, 30" >
-                                        <LineSegment Point="0, 10"/>
-                                        <LineSegment Point="2.5, 15"/>
-                                        <LineSegment Point="5, 10"/>
-                                        <LineSegment Point="7.5, 15"/>
-                                        <LineSegment Point="10, 10"/>
-                                        <LineSegment Point="12.5, 15"/>
-                                        <LineSegment Point="15, 10"/>
-                                        <LineSegment Point="15, 30"/>
-                                    </PathFigure>
-                                </PathGeometry>
-                            </GeometryDrawing.Geometry>
-                        </GeometryDrawing>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </Image.Source>
+            <Image.Style>
+                <Style TargetType="Image">
+                    <Setter Property="Source" Value="{StaticResource Crown}"/>
+                </Style>
+            </Image.Style>
         </Image>
     </Grid>
 </UserControl>
