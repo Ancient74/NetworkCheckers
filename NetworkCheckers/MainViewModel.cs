@@ -195,6 +195,7 @@ namespace NetworkCheckers
         private void OnTurnStarted(PlayerType playerType)
         {
             moves = new List<BoardIndex>();
+            GameViewViewModel.Mover = playerType; 
         }
 
         private void OnPlayerTypeRecieved(PlayerType obj)
