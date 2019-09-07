@@ -28,9 +28,9 @@ namespace NetworkCheckers
 
         public string GreetingText => "Hello: " + UserName;
 
-        public MainScreenViewModel(IStartGame startGame)
+        public MainScreenViewModel(IStartGame startGame, IConfigServer configServer)
         {
-            MainMenu = new MainMenuViewModel(startGame, this);
+            MainMenu = new MainMenuViewModel(startGame, this, configServer);
             userNameProvider = new CachedUserNameProvider(new FileUserNameProvider("user_name.txt"));
             popUpController = new ChangeNamePopUpController();
         }

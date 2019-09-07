@@ -19,9 +19,9 @@
                     <Border CornerRadius="20" BorderThickness="3" Width="200" x:Name="border">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="0, 1">
-                                <GradientStop Offset="0" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}"/>
-                                <GradientStop Offset="0.7" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}"/>
-                                <GradientStop x:Name="gradientStop" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}" Offset="1"/>
+                                <GradientStop x:Name="gradientStart" Offset="0" Color="{Binding RelativeSource={RelativeSource  TemplatedParent},  Path=Background.Color}"/>
+                                <GradientStop Offset="0.7" Color="{Binding ElementName=gradientStart, Path=Color}"/>
+                                <GradientStop x:Name="gradientStop" Color="{Binding RelativeSource={RelativeSource TemplatedParent},  Path=Background.Color}" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
                         <Border.BorderBrush>
@@ -36,6 +36,12 @@
                         </ContentPresenter>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0" Storyboard.TargetProperty="Color" Storyboard.TargetName="gradientStart" To="DarkGray"></ColorAnimation>
+                                        <ColorAnimation Duration="0" Storyboard.TargetProperty="Color" Storyboard.TargetName="gradientStop" To="DarkGray"></ColorAnimation>
+                                    </Storyboard>
+                                </VisualState>
                                 <VisualState x:Name="Normal">
                                     <Storyboard>
                                         <ColorAnimation Duration="0" Storyboard.TargetProperty="Color" Storyboard.TargetName="gradientStop" To="{Binding ElementName=gradientStart}"></ColorAnimation>

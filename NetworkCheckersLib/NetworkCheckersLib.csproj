@@ -44,14 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IpConfigController.cs" />
     <Compile Include="MoveHandlers\BeatHandler.cs" />
     <Compile Include="BoardIndex.cs" />
     <Compile Include="MoveHandlers\CannotBeatHandler.cs" />
     <Compile Include="Checker.cs" />
     <Compile Include="CheckerBoard.cs" />
     <Compile Include="Network\ClientBase.cs" />
-    <Compile Include="Network\ConnectResult.cs" />
-    <Compile Include="Network\DisconectedException.cs" />
     <Compile Include="MoveHandlers\FirstMoveDoneHandler.cs" />
     <Compile Include="Network\GameClient.cs" />
     <Compile Include="Network\GameHost.cs" />
@@ -59,6 +58,7 @@
     <Compile Include="Network\IClient.cs" />
     <Compile Include="Network\IMessanger.cs" />
     <Compile Include="MoveHandlers\IPossibleMovesHandler.cs" />
+    <Compile Include="Network\IpConfig.cs" />
     <Compile Include="Network\MessageType.cs" />
     <Compile Include="MoveHandlers\MoveHandler.cs" />
     <Compile Include="Network\ResultType.cs" />

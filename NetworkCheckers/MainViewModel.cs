@@ -11,11 +11,13 @@ using NetworkCheckersLib.Network;
 
 namespace NetworkCheckers
 {
-    public class MainViewModel : NotifiableObject, IStartGame, ICancelLoading, IMessageSender
+    public class MainViewModel : NotifiableObject, IStartGame, ICancelLoading, IMessageSender, IIpConfigMenu, IConfigServer
     {
         private GameViewViewModel gameViewViewModel;
         public MainScreenViewModel MainScreenViewModel { get; }
         public LoadingScreenViewModel LoadingScreenViewModel { get; }
+
+        public IpConfigViewModel IpConfigViewModel { get; }
 
         public GameViewViewModel GameViewViewModel
         {
@@ -61,8 +63,9 @@ namespace NetworkCheckers
 
         public MainViewModel()
         {
-            MainScreenViewModel = new MainScreenViewModel(this);
+            MainScreenViewModel = new MainScreenViewModel(this, this);
             LoadingScreenViewModel = new LoadingScreenViewModel(this);
+            IpConfigViewModel = new IpConfigViewModel(this);
         }
         private int switchView = 0;
         public int SwitchView
@@ -223,7 +226,7 @@ namespace NetworkCheckers
         public void FindGame()
         {
             SwitchView = 1;
-            client = new GameClient();
+            client = new GameClient(IpConfigViewModel.IpConfig);
             SubscribeToClient(client);
             client.Connect();
         }
@@ -237,6 +240,16 @@ namespace NetworkCheckers
         public void Send(string message)
         {
             client.WriteMessage(MessageType.TextMessage, message);
+        }
+
+        public void Cancel()
+        {
+            SwitchView = 0;
+        }
+
+        public void Configure()
+        {
+            SwitchView = 3;
         }
     }
 }

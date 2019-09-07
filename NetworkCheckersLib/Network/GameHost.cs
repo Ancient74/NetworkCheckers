@@ -15,7 +15,7 @@ namespace NetworkCheckersLib.Network
         private PlayerType playerTypeCurrent;
 
         public event Action GameStarted;
-        public GameHost()
+        public GameHost(IpConfig ipConfig) : base(ipConfig)
         {
             MessageRecieved += OnMessageRecieved;
             GameStarted += OnGameStarted;

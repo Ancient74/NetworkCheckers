@@ -11,14 +11,17 @@ namespace NetworkCheckers
     {
         private ICommand changeNameCommand;
         private ICommand findGameCommand;
+        private ICommand configureCommand;
 
         private readonly IStartGame startGame;
         private readonly IChangeName changeName;
+        private readonly IConfigServer configureServer;
 
-        public MainMenuViewModel(IStartGame startGame, IChangeName changeName)
+        public MainMenuViewModel(IStartGame startGame, IChangeName changeName, IConfigServer configureServer)
         {
             this.changeName = changeName;
             this.startGame = startGame;
+            this.configureServer = configureServer;
         }
 
         public ICommand FindGameCommand
@@ -38,6 +41,15 @@ namespace NetworkCheckers
                 if (changeNameCommand == null)
                     changeNameCommand = new CallbackCommand(() => changeName.ChangeName());
                 return changeNameCommand;
+            }
+        }
+        public ICommand ConfigureCommand
+        {
+            get
+            {
+                if (configureCommand == null)
+                    configureCommand = new CallbackCommand(() => configureServer.Configure());
+                return configureCommand;
             }
         }
 

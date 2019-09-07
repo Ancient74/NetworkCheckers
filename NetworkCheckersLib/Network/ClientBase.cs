@@ -18,17 +18,20 @@ namespace NetworkCheckersLib.Network
         public event Action Connected;
         public event Action Disconnected;
 
-        private int Port { get; } = 14447;
-        private string HostAddr { get; } = "127.0.0.1";
+        private int Port { get; }
+        private string HostAddr { get; }
 
         private Timer pingTimer;
         private readonly object locker = new object();
 
         private CancellationTokenSource source = new CancellationTokenSource();
 
-        public ClientBase()
+        public ClientBase(IpConfig ipConfig)
         {
+            HostAddr = ipConfig.Ip;
+            Port = ipConfig.Port;
         }
+
         public async void Connect()
         {
             client = new TcpClient();

@@ -8,7 +8,7 @@ namespace NetworkCheckersLib.Network
 {
     public class GameClient : ClientBase
     {
-        public GameClient()
+        public GameClient(IpConfig ipConfig):base(ipConfig)
         {
             MessageRecieved += OnMessageRecieved;
         }

@@ -23,18 +23,20 @@ namespace NetworkCheckersLib.Network
         protected static readonly ILog Log = LogManager.GetLogger(typeof(HostBase));
 
         private TcpListener tcpListener;
-        private int Port { get; } = 14447;
+        private int Port { get; }
 
         private CancellationTokenSource source = new CancellationTokenSource();
 
-        private IPAddress IPAddress { get; } = IPAddress.Parse("127.0.0.1");
+        private IPAddress IPAddress { get; }
 
         protected List<HostClient> clients = new List<HostClient>();
 
         public event Action<TcpClient, MessageType, string> MessageRecieved;
 
-        public HostBase()
+        public HostBase(IpConfig ipConfig)
         {
+            IPAddress = IPAddress.Parse(ipConfig.Ip);
+            Port = ipConfig.Port;
         }
 
         public void Start()

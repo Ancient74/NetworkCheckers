@@ -15,5 +15,6 @@
     <StackPanel>
         <Button Content="Find Game" Background="{StaticResource Even}" Command="{Binding FindGameCommand}"></Button>
         <Button Content="Change Name" Background="{StaticResource Odd}" Command="{Binding ChangeNameCommand}"></Button>
+        <Button Content="Server config" Background="{StaticResource Even}" Command="{Binding ConfigureCommand}"></Button>
     </StackPanel>
 </UserControl>

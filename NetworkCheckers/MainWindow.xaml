@@ -20,6 +20,9 @@
                     <DataTemplate x:Key="gameView">
                         <local:HUD/>
                     </DataTemplate>
+                    <DataTemplate x:Key="configView">
+                        <local:IpConfigView/>
+                    </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -44,6 +47,10 @@
                         <DataTrigger Binding="{Binding SwitchView}" Value="2">
                             <Setter Property="ContentTemplate" Value="{StaticResource gameView}" />
                             <Setter Property="Content" Value="{Binding GameViewViewModel}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SwitchView}" Value="3">
+                            <Setter Property="ContentTemplate" Value="{StaticResource configView}" />
+                            <Setter Property="Content" Value="{Binding IpConfigViewModel}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
