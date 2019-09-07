@@ -12,7 +12,7 @@
                 <ResourceDictionary Source="Resources.xaml"/>
                 <ResourceDictionary>
                     <DataTemplate x:Key="mainScreen">
-                        <local:MainScreen/>
+                        <local:MainScreen/> 
                     </DataTemplate>
                     <DataTemplate x:Key="loadingScreen">
                         <local:LoadingScreen/>

@@ -104,6 +104,8 @@ namespace NetworkCheckersLib.Network
         {
             lock(locker)
             {
+                if (message == null)
+                    return;
                 var stream = client.GetStream();
                 var writer = new BinaryWriter(stream);
                 writer.Write((int)messageType);

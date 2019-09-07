@@ -76,8 +76,8 @@
                         </ItemsControl>
                     </ScrollViewer>
                     <StackPanel Grid.Row="2">
-                        <TextBox Text="{Binding Message}" FontSize="16"/>
-                        <Button  Command="{Binding SendMessageCommand}">Отправить</Button>
+                        <TextBox Text="{Binding Message, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" FontSize="16"/>
+                        <Button IsDefault="True"  Command="{Binding SendMessageCommand}">Отправить</Button>
                     </StackPanel>
                 </Grid>
             </Grid>

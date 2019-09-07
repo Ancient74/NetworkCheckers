@@ -118,6 +118,8 @@ namespace NetworkCheckers
             this.MessageSender = messageSender;
             SendMessageCommand = new CallbackCommand(() =>
             {
+                if (string.IsNullOrEmpty(Message))
+                    return;
                 messageSender.Send(Message);
                 Messages.Add(new MessageViewModel(Message, true));
                 Message = "";
