@@ -82,9 +82,10 @@ namespace NetworkCheckersLib.Network
         {
             TcpClient client = clientHost.client;
             clientHost.pingTimer = new Timer(Ping, client, TimeSpan.FromSeconds(0.0), TimeSpan.FromSeconds(1.0));
-            try
+          
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
+                try
                 {
                     using (client)
                     {
@@ -107,16 +108,16 @@ namespace NetworkCheckersLib.Network
                             }
                         }
                     }
-                });
-            }
-            catch
-            {
+                    }
+                    catch
+                    {
 
-            }
-            finally
-            {
-                DisconnectClient(clientHost);
-            }
+                    }
+                    finally
+                    {
+                        DisconnectClient(clientHost);
+                    }
+            });
         }
 
         private void DisconnectClient(HostClient client)
